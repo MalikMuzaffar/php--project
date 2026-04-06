@@ -1,4 +1,22 @@
 
+//<?php
+//session_start();
+
+// //initializing variables
+//$username = "";
+//$email    = "";
+//$errors = array(); 
+
+// //connect to the database
+//define('DB_SERVER', 'localhost');
+   //define('DB_USERNAME', 'supportReddy');
+   //define('DB_PASSWORD', '');
+   //define('DB_DATABASE', 'ecommerece');
+   //$db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
+//if (!$db) {
+    //die("Connection failed: " . mysqli_connect_error());
+//}
+
 <?php
 session_start();
 
@@ -8,11 +26,20 @@ $email    = "";
 $errors = array(); 
 
 // connect to the database
-define('DB_SERVER', 'localhost');
-   define('DB_USERNAME', 'supportReddy');
-   define('DB_PASSWORD', '');
-   define('DB_DATABASE', 'ecommerece');
-   $db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
+// CHANGE: 'localhost' to 'db' (the name of your service in docker-compose)
+define('DB_SERVER', 'db'); 
+
+// CHANGE: 'supportReddy' to 'root' (default for the mysql image)
+define('DB_USERNAME', 'root'); 
+
+// CHANGE: This should be empty "" if you used MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+define('DB_PASSWORD', ''); 
+
+// CHANGE: This must match the MYSQL_DATABASE name in your docker-compose.yml
+define('DB_DATABASE', 'onlineshop'); 
+
+$db = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
+
 if (!$db) {
     die("Connection failed: " . mysqli_connect_error());
 }
