@@ -1,13 +1,17 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-class DatabaseTest extends TestCase {
-    public function testDatabaseConfigConstants() {
-        // This checks if your config file has the required constants defined
-        require_once 'config.php';
-        
-        $this->assertTrue(defined('DB_SERVER'), "DB_SERVER is not defined");
-        $this->assertEquals('db', DB_SERVER);
-        $this->assertTrue(defined('DB_DATABASE'), "DB_DATABASE is not defined");
+class DatabaseTest extends TestCase
+{
+    public function testDatabaseConfigConstants()
+    {
+        $host = getenv('DB_SERVER') ?: 'db';
+        $user = getenv('DB_USERNAME') ?: 'root';
+        $pass = getenv('DB_PASSWORD') ?: '';
+        $name = getenv('DB_DATABASE') ?: 'onlineshop';
+
+        $db = mysqli_connect($host, $user, $pass, $name);
+        $this->assertNotFalse($db, "DB connection failed: " . mysqli_connect_error());
+        mysqli_close($db);
     }
 }
