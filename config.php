@@ -1,22 +1,3 @@
-
-
-//session_start();
-
-// //initializing variables
-//$username = "";
-//$email    = "";
-//$errors = array(); 
-
-// //connect to the database
-//define('DB_SERVER', 'localhost');
-   //define('DB_USERNAME', 'supportReddy');
-   //define('DB_PASSWORD', '');
-   //define('DB_DATABASE', 'ecommerece');
-   //$db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
-//if (!$db) {
-    //die("Connection failed: " . mysqli_connect_error());
-//}
-
 <?php
 session_start();
 
