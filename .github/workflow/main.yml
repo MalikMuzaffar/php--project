@@ -2,9 +2,11 @@ name: Professional DevOps CI/CD
 
 on:
   push:
-    branches: [ "master" ]
+    branches: 
+      - master
   pull_request:
-    branches: [ "master" ]
+    branches: 
+      - master
 
 jobs:
   # STAGE 1: Code Quality & Testing
