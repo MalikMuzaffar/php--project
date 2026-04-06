@@ -2,9 +2,9 @@ name: Professional DevOps CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   # STAGE 1: Code Quality & Testing
@@ -48,12 +48,44 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/online-shop:latest
 
-  # STAGE 3: Continuous Deployment (CD)
+  ## STAGE 3: Continuous Deployment (CD)
+  #deploy:
+    #needs: build-and-push
+    #runs-on: ubuntu-latest
+    #if: github.ref == 'refs/heads/main'
+    #steps:
+      #- name: Deploy to Server via SSH
+        #RUN: ssh -i 
+        ## You would use an SSH action here to pull the new image on your server
+        #run: echo "Deploying to production server..."
+        
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    # Only deploy if the changes were merged into the main branch
     if: github.ref == 'refs/heads/main'
+    
     steps:
       - name: Deploy to Server via SSH
-        # You would use an SSH action here to pull the new image on your server
-        run: echo "Deploying to production server..."
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            # 1. Navigate to your project directory
+            cd /home/${{ secrets.SERVER_USER }}/online-shop
+            
+            # 2. Login to Docker Hub on the server (to pull private images)
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            
+            # 3. Pull the latest image you just built
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/online-shop:latest
+            
+            # 4. Restart the containers with the new image
+            # This assumes you are using docker-compose
+            docker-compose up -d
+            
+            # 5. Optional: Clean up old, unused images to save disk space
+            docker image prune -f
