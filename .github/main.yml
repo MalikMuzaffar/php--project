@@ -10,6 +10,16 @@ jobs:
   # STAGE 1: Code Quality & Testing
   test-and-lint:
     runs-on: ubuntu-latest
+    # Add this services section:
+    services:
+      db:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: onlineshop
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
