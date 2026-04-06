@@ -11,9 +11,8 @@ jobs:
   test-and-lint:
     runs-on: ubuntu-latest
     steps:
-      steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -21,15 +20,6 @@ jobs:
           php-version: '8.1'
           extensions: mysqli, pdo, pdo_mysql
           tools: phpunit
-
-      # Add this step to prevent the "require_once" failure
-      - name: Create config.php for Testing
-        run: |
-          echo "<?php 
-          define('DB_SERVER', 'db'); 
-          define('DB_USERNAME', 'root'); 
-          define('DB_PASSWORD', ''); 
-          define('DB_DATABASE', 'onlineshop');" > config.php
 
       - name: PHP Syntax Check (Linting)
         run: find . -name "*.php" -exec php -l {} \;
@@ -52,7 +42,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and Push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
