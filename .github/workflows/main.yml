@@ -32,7 +32,9 @@ jobs:
           php-version: '8.1'
           extensions: mysqli, pdo, pdo_mysql
           tools: phpunit:10.5
-
+steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
       - name: PHP Syntax Check (Linting)
         run: find . -name "*.php" -exec php -l {} \;
 
@@ -81,6 +83,17 @@ jobs:
     runs-on: ubuntu-latest
     #if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+	run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
+          chmod 600 key.pem
+
+          # Copy database
+          scp -o StrictHostKeyChecking=no -i key.pem ./database ubuntu@$SERVER_IP:/home/ubuntu/online-shop/database
+        
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
