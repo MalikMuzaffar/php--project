@@ -24,9 +24,9 @@ services:
     networks:
       - shop-network
       
-  networks:
+networks:
     shop-network:
       driver: bridge
       
-  volumes:
+volumes:
     db-data:
