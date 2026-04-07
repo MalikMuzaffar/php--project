@@ -79,28 +79,34 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    #if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Prepare SSH Key and Copy Files
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}
-	run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          # Create the .pem file
+          echo "$SSH_KEY" > key.pem
           chmod 600 key.pem
+          
+          # Use -r for directories and ensure the remote path exists
+          # We use ssh first to make sure the directory exists to avoid scp errors
+          ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@$SERVER_IP "mkdir -p /home/ubuntu/online-shop/database"
+          
+          scp -o StrictHostKeyChecking=no -i key.pem -r ./database/* ubuntu@$SERVER_IP:/home/ubuntu/online-shop/database/
 
-          # Copy database
-          scp -o StrictHostKeyChecking=no -i key.pem ./database ubuntu@$SERVER_IP:/home/ubuntu/online-shop/database
-        
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
+          username: ubuntu  # Or ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /home/${{ secrets.SERVER_USER }}/online-shop
+            cd /home/ubuntu/online-shop
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/online-shop:latest
             docker compose up -d
