@@ -2,18 +2,31 @@ version: '3.8'
 
 services:
   website: 
-    build: .
+    image: muzaffaribrar/online-shop:latest
     ports: 
       - 8080:80
-    volumes:
-      - .:/var/www/html
+    #volumes:
+      #- .:/var/www/html
     depends_on:
       - db
+    networks:
+      - shop-network
 
   db:
     image: mysql:5.7
+    restart: always
     environment:
       MYSQL_DATABASE: onlineshop
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
-      - ./database/onlineshop.sql:/docker-entrypoint-initdb.d/onlineshop.sql
+      - db-data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d/onlineshop.sql
+    networks:
+      - shop-network
+      
+  networks:
+    shop-network:
+      driver: bridge
+      
+  volumes:
+    db-data:

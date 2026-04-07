@@ -2,8 +2,8 @@ name: Professional DevOps CI/CD
 on:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  #pull_request:
+    #branches: [ "master" ]
 
 jobs:
   # STAGE 1: Code Quality & Testing
@@ -79,7 +79,7 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    #if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -92,5 +92,5 @@ jobs:
             cd /home/${{ secrets.SERVER_USER }}/online-shop
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/online-shop:latest
-            docker-compose up -d
+            docker compose up -d
             docker image prune -f
